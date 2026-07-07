@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>색깔 맞추기 퍼즐</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="game-card">
+      <header class="header">
+        <h1>색깔 맞추기 퍼즐</h1>
+        <p>같은 색 블록 3개 이상을 맞춰 점수를 올려보세요.</p>
+      </header>
+
+      <section class="status-row">
+        <div class="status-box">
+          <span>점수</span>
+          <strong id="score">0</strong>
+        </div>
+
+        <div class="status-box">
+          <span>최고점</span>
+          <strong id="bestScore">0</strong>
+        </div>
+
+        <div class="status-box">
+          <span>남은 이동</span>
+          <strong id="moves">30</strong>
+        </div>
+      </section>
+
+      <section class="board-wrap">
+        <div id="board" class="board"></div>
+        <div id="message" class="message show">
+          시작 버튼을 눌러주세요
+        </div>
+      </section>
+
+      <section class="button-row">
+        <button id="startBtn" type="button">시작</button>
+        <button id="restartBtn" type="button">다시 시작</button>
+      </section>
+
+      <section class="guide">
+        <p>인접한 블록 2개를 차례로 터치하면 위치가 바뀝니다.</p>
+        <p>같은 색 3개 이상이 가로·세로로 연결되면 사라집니다.</p>
+      </section>
+    </section>
+  </main>
+
+  <script src="./game.js"></script>
+</body>
+</html>
