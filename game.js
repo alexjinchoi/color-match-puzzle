@@ -2,18 +2,31 @@
 // Sound Effects
 // =============================
 
+// =============================
+// Sound Effects
+// =============================
+
 let soundEnabled = true;
 let audioUnlocked = false;
+let bgmPlaying = false;
 
 const sounds = {
   select: new Audio("./sounds/select.mp3"),
-  clearCombo: new Audio("./sounds/clear-combo.mp3")
+  clearCombo: new Audio("./sounds/clear-combo.mp3"),
+  bgm: new Audio("./sounds/puzzle-loop.mp3")
 };
 
-Object.values(sounds).forEach(sound => {
-  sound.preload = "auto";
-  sound.volume = 0.5;
-});
+// 효과음 설정
+sounds.select.preload = "auto";
+sounds.select.volume = 0.5;
+
+sounds.clearCombo.preload = "auto";
+sounds.clearCombo.volume = 0.55;
+
+// 배경음악 설정
+sounds.bgm.preload = "auto";
+sounds.bgm.volume = 0.22;
+sounds.bgm.loop = true;
 
 function unlockAudio() {
   if (audioUnlocked) return;
@@ -42,11 +55,34 @@ function playSound(name) {
 
   if (!sound) return;
 
+  // 배경음악은 playSound로 재생하지 않음
+  if (name === "bgm") return;
+
   sound.currentTime = 0;
 
   sound.play().catch(() => {
     // iPhone Safari 등에서 재생이 차단될 경우 무시
   });
+}
+
+function playBgm() {
+  if (!soundEnabled || !audioUnlocked || bgmPlaying) return;
+
+  sounds.bgm.currentTime = 0;
+
+  sounds.bgm.play()
+    .then(() => {
+      bgmPlaying = true;
+    })
+    .catch(() => {
+      bgmPlaying = false;
+    });
+}
+
+function stopBgm() {
+  sounds.bgm.pause();
+  sounds.bgm.currentTime = 0;
+  bgmPlaying = false;
 }
 
 const boardEl = document.getElementById("board");
@@ -77,6 +113,8 @@ bestScoreEl.textContent = bestScore;
 
 function startGame() {
   unlockAudio();
+  stopBgm();
+  playBgm();
   
   score = 0;
   movesLeft = MAX_MOVES;
@@ -360,6 +398,8 @@ function updateInfo() {
 function endGame() {
   isGameOver = true;
   isRunning = false;
+
+  stopBgm();
 
   if (score > bestScore) {
     bestScore = score;
