@@ -1,3 +1,54 @@
+// =============================
+// Sound Effects
+// =============================
+
+let soundEnabled = true;
+let audioUnlocked = false;
+
+const sounds = {
+  select: new Audio("./sounds/select.mp3"),
+  clearCombo: new Audio("./sounds/clear-combo.mp3")
+};
+
+Object.values(sounds).forEach(sound => {
+  sound.preload = "auto";
+  sound.volume = 0.5;
+});
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  Object.values(sounds).forEach(sound => {
+    sound.muted = true;
+
+    sound.play()
+      .then(() => {
+        sound.pause();
+        sound.currentTime = 0;
+        sound.muted = false;
+      })
+      .catch(() => {
+        sound.muted = false;
+      });
+  });
+
+  audioUnlocked = true;
+}
+
+function playSound(name) {
+  if (!soundEnabled || !audioUnlocked) return;
+
+  const sound = sounds[name];
+
+  if (!sound) return;
+
+  sound.currentTime = 0;
+
+  sound.play().catch(() => {
+    // iPhone Safari 등에서 재생이 차단될 경우 무시
+  });
+}
+
 const boardEl = document.getElementById("board");
 const scoreEl = document.getElementById("score");
 const bestScoreEl = document.getElementById("bestScore");
@@ -25,6 +76,8 @@ let isGameOver = false;
 bestScoreEl.textContent = bestScore;
 
 function startGame() {
+  unlockAudio();
+  
   score = 0;
   movesLeft = MAX_MOVES;
   selectedTile = null;
@@ -115,11 +168,14 @@ function renderBoard(matchedSet = new Set()) {
 async function handleTileClick(row, col) {
   if (!isRunning || isBusy || isGameOver) return;
 
-  if (!selectedTile) {
-    selectedTile = { row, col };
-    renderBoard();
-    return;
-  }
+if (!selectedTile) {
+  unlockAudio();
+  playSound("select");
+
+  selectedTile = { row, col };
+  renderBoard();
+  return;
+}
 
   if (selectedTile.row === row && selectedTile.col === col) {
     selectedTile = null;
@@ -127,11 +183,13 @@ async function handleTileClick(row, col) {
     return;
   }
 
-  if (!isAdjacent(selectedTile, { row, col })) {
-    selectedTile = { row, col };
-    renderBoard();
-    return;
-  }
+if (!isAdjacent(selectedTile, { row, col })) {
+  playSound("select");
+
+  selectedTile = { row, col };
+  renderBoard();
+  return;
+}
 
   const first = selectedTile;
   const second = { row, col };
@@ -179,6 +237,8 @@ async function resolveMatches(initialMatches) {
   let combo = 1;
 
   while (matches.size > 0) {
+    playSound("clearCombo");
+    
     renderBoard(matches);
 
     const gainedScore = matches.size * 10 * combo;
